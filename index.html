@@ -26,6 +26,16 @@
             // A Scene is created
             const scene = new THREE.Scene();
 
+
+            {
+                const color = 0xFFFFFF;
+                const intensity = 1;
+                const light = new THREE.DirectionalLight(color, intensity);
+                light.position.set(-1, 2, 4);
+                scene.add(light);
+            }
+
+
             // Creates Geometry object that holds the vertex for the cube
             const boxWidth = 1;
             const boxHeight = 1;
@@ -33,7 +43,9 @@
             const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
             // Creates basic material and sets it's color
-            const material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
+            // const material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
+            const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
+
 
             /* Creates Mesh */
             const cube = new THREE.Mesh(geometry, material);
@@ -43,6 +55,19 @@
 
             // Renders the scene by passing the scene and camera
             renderer.render(scene, camera);
+
+            function render(time) {
+                time *= 0.001;  // convert time to seconds
+
+                cube.rotation.x = time;
+                cube.rotation.y = time;
+
+                renderer.render(scene, camera);
+
+                requestAnimationFrame(render);
+            }
+            // request to the browser that you want to animate something
+            requestAnimationFrame(render);
         }
         main();
     </script>
