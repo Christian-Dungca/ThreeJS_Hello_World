@@ -18,47 +18,42 @@
             const renderer = new THREE.WebGLRenderer({ canvas });
 
             // Creates a Perspective Camera 
-            const fov = 75;
+            const fov = 40;
             const aspect = 2;  // the canvas default
             const near = 0.1;
-            const far = 5;
+            const far = 1000;
             const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-
-            /* Cube wil be at origin, so camera is moved back */
-            camera.position.z = 2;
+            camera.position.set(0, 50, 0);
+            camera.up.set(0, 0, 1);
+            camera.lookAt(0, 0, 0);
 
             // A Scene is created
             const scene = new THREE.Scene();
 
-
             {
                 const color = 0xFFFFFF;
-                const intensity = 1;
-                const light = new THREE.DirectionalLight(color, intensity);
-                light.position.set(-1, 2, 4);
+                const intensity = 3;
+                const light = new THREE.PointLight(color, intensity);
                 scene.add(light);
             }
 
+            // an array of objects who's rotation to update
+            const objects = [];
 
-            // Creates Geometry object that holds the vertex for the cube
-            const boxWidth = 1;
-            const boxHeight = 1;
-            const boxDepth = 1;
-            const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
-
-            // Creates basic material and sets it's color
-            // const material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
             const material = new THREE.MeshPhongMaterial({ color: 0x44aa88 });  // greenish blue
 
+            const radius = 1;
+            const widthSegments = 6;
+            const heightSegments = 6;
+            const sphereGeometry = new THREE.SphereGeometry(
+                radius, widthSegments, heightSegments);
 
-            /* Creates Mesh */
-            // const cube = new THREE.Mesh(geometry, material);
+            const sunMaterial = new THREE.MeshPhongMaterial({ emissive: 0xFFFF00 });
 
-            // Add Cube to Scene
-            // scene.add(cube);
-
-            // Renders the scene by passing the scene and camera
-            // renderer.render(scene, camera);
+            const sunMesh = new THREE.Mesh(sphereGeometry, sunMaterial);
+            sunMesh.scale.set(5, 5, 5);
+            scene.add(sunMesh);
+            objects.push(sunMesh);
 
             function makeInstance(geometry, color, x) {
                 const material = new THREE.MeshPhongMaterial({ color });
@@ -71,11 +66,11 @@
                 return cube;
             }
 
-            const cubes = [
-                makeInstance(geometry, 0x44aa88, 0),
-                makeInstance(geometry, 0x8844aa, -2),
-                makeInstance(geometry, 0xaa8844, 2),
-            ];
+            /*  const cubes = [
+                 makeInstance(geometry, 0x44aa88, 0),
+                 makeInstance(geometry, 0x8844aa, -2),
+                 makeInstance(geometry, 0xaa8844, 2),
+             ]; */
 
             function resizeRendererToDisplaySize(renderer) {
                 const canvas = renderer.domElement;
@@ -102,14 +97,17 @@
                 camera.aspect = canvas.clientWidth / canvas.clientHeight;
                 camera.updateProjectionMatrix(); // Updates the camera projection matrix
 
-
-
-                cubes.forEach((cube, ndx) => {
-                    const speed = 1 + ndx * .1;
-                    const rot = time * speed;
-                    cube.rotation.x = rot;
-                    cube.rotation.y = rot;
+                // Rotates each objects in the "objects" array
+                objects.forEach((obj) => {
+                    obj.rotation.y = time;
                 });
+
+                /*  cubes.forEach((cube, ndx) => {
+                     const speed = 1 + ndx * .1;
+                     const rot = time * speed;
+                     cube.rotation.x = rot;
+                     cube.rotation.y = rot;
+                 }); */
 
                 renderer.render(scene, camera);
 
